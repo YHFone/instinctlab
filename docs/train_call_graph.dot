@@ -1,0 +1,40 @@
+digraph TrainCallGraph {
+  rankdir=TB;
+  node [shape=box, style="rounded,filled", fillcolor="#f8f9fb", color="#2b2f33", fontname="Helvetica"];
+
+  train [label="scripts/instinct_rl/train.py\n(entry)\nparse CLI · AppLauncher · Hydra"];
+  app [label="AppLauncher / Isaac Sim\n(simulation app)"];
+  import_tasks [label="import instinctlab.tasks\n(task registration via configs)"];
+  gym_make [label="gym.make(task_id, cfg=env_cfg)\n→ lookup entry_point"];
+  task_cfg [label="Task cfg (plane_shadowing_cfg.py)\ndefines scene, robot, motion_reference, AmassMotionCfg"];
+  instinct_env [label="instinctlab.envs:InstinctRlEnv\n(InstinctRlEnv)"];
+  manager_based [label="ManagerBasedRLEnv (isaaclab)\n(scene/sensors/managers init)"];
+
+  motion_ref [label="MotionReferenceManager\n(load MotionBuffer(s) from Amass/Aistpp)"];
+  multi_reward [label="MultiRewardManager\n(grouped rewards)" ];
+  monitor_mgr [label="MonitorManager\n(monitors & monitor terms)"];
+
+  wrapper [label="InstinctRlVecEnvWrapper\n(adapt to runner)"];
+  runner [label="OnPolicyRunner (instinct_rl)\n(runner.learn: sample → optimize → checkpoint)"];
+
+  // edges
+  train -> app;
+  train -> import_tasks;
+  import_tasks -> task_cfg [label="registers Gym id(s)", fontsize=10];
+  train -> gym_make;
+  gym_make -> instinct_env [label="entry_point -> InstinctRlEnv", fontsize=10];
+  gym_make -> task_cfg [style=dashed, fontsize=10];
+  instinct_env -> manager_based [label="subclass / init managers"];
+
+  manager_based -> motion_ref [label="installs motion_reference"];
+  manager_based -> multi_reward [label="may replace reward_manager"];
+  manager_based -> monitor_mgr [label="installs monitor_manager"];
+
+  manager_based -> wrapper [label="env instance returned"];
+  wrapper -> runner [label="passed to OnPolicyRunner"];
+
+  { rank = same; motion_ref; multi_reward; monitor_mgr }
+
+  // styling
+  edge [color="#333", arrowhead=open];
+}

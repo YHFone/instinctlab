@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="720" viewBox="0 0 1000 720">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#333" />
+    </marker>
+    <style>
+      .box { fill:#f8f9fb; stroke:#2b2f33; stroke-width:1.5; rx:6; }
+      .title { font: 600 14px/1.1 'Segoe UI', Roboto, Arial; fill:#111; }
+      .note { font: 12px/1.1 'Segoe UI', Roboto, Arial; fill:#333; }
+      .small { font: 11px/1.0 'Segoe UI', Roboto, Arial; fill:#555; }
+      .arrow { stroke:#333; stroke-width:1.4; fill:none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <!-- vertical flow boxes -->
+  <g transform="translate(60,20)">
+    <rect class="box" x="0" y="0" width="880" height="60" />
+    <text class="title" x="16" y="24">scripts/instinct_rl/train.py — entry</text>
+    <text class="small" x="16" y="44">parse CLI, AppLauncher, hydra, create env via gym.make()</text>
+
+    <line class="arrow" x1="440" y1="60" x2="440" y2="100" />
+
+    <rect class="box" x="0" y="100" width="880" height="54" />
+    <text class="title" x="16" y="124">AppLauncher / Isaac Sim (simulation app)</text>
+    <text class="small" x="16" y="144">starts/attaches simulator used by envs</text>
+
+    <line class="arrow" x1="440" y1="154" x2="440" y2="200" />
+
+    <rect class="box" x="0" y="200" width="880" height="56" />
+    <text class="title" x="16" y="224">import instinctlab.tasks → task registration</text>
+    <text class="small" x="16" y="244">auto-import configs that call gym.register()</text>
+
+    <line class="arrow" x1="440" y1="256" x2="440" y2="300" />
+
+    <rect class="box" x="0" y="300" width="880" height="56" />
+    <text class="title" x="16" y="324">gym.make(task_id, cfg=env_cfg)</text>
+    <text class="small" x="16" y="344">looks up registered entry_point → InstinctRlEnv</text>
+
+    <line class="arrow" x1="440" y1="356" x2="440" y2="400" />
+
+    <rect class="box" x="0" y="400" width="880" height="56" />
+    <text class="title" x="16" y="424">instinctlab.envs:InstinctRlEnv</text>
+    <text class="small" x="16" y="444">subclasses ManagerBasedRLEnv; installs managers & monitors</text>
+
+    <line class="arrow" x1="440" y1="456" x2="440" y2="500" />
+
+    <rect class="box" x="0" y="500" width="880" height="56" />
+    <text class="title" x="16" y="524">ManagerBasedRLEnv (isaaclab)</text>
+    <text class="small" x="16" y="544">initializes sensors, managers, scene, assets, and step loop</text>
+  </g>
+
+  <!-- managers group to the right -->
+  <g transform="translate(80,580)">
+    <rect class="box" x="0" y="0" width="260" height="48" />
+    <text class="title" x="12" y="24">MotionReferenceManager</text>
+    <text class="small" x="12" y="40">loads MotionBuffer(s) from Amass/Aistpp configs</text>
+
+    <rect class="box" x="320" y="0" width="260" height="48" />
+    <text class="title" x="332" y="24">MultiRewardManager</text>
+    <text class="small" x="332" y="40">computes grouped rewards</text>
+
+    <rect class="box" x="640" y="0" width="260" height="48" />
+    <text class="title" x="652" y="24">MonitorManager</text>
+    <text class="small" x="652" y="40">collects monitor terms & logs</text>
+  </g>
+
+  <!-- arrows from ManagerBasedRLEnv to managers -->
+  <line class="arrow" x1="500" y1="520" x2="200" y2="580" />
+  <line class="arrow" x1="500" y1="520" x2="520" y2="580" />
+  <line class="arrow" x1="500" y1="520" x2="840" y2="580" />
+
+  <!-- lower flow: wrapper -> runner -->
+  <g transform="translate(60,640)">
+    <rect class="box" x="0" y="0" width="880" height="56" />
+    <text class="title" x="16" y="24">InstinctRlVecEnvWrapper</text>
+    <text class="small" x="16" y="44">adapts isaaclab env to Instinct-RL runner interface</text>
+
+    <line class="arrow" x1="440" y1="56" x2="440" y2="100" />
+
+    <rect class="box" x="0" y="100" width="880" height="56" />
+    <text class="title" x="16" y="124">OnPolicyRunner (instinct_rl)</text>
+    <text class="small" x="16" y="144">runner.learn() → sampling, optimize, checkpoint, logs</text>
+  </g>
+
+  <!-- connectors from top -> wrapper/runner area -->
+  <line class="arrow" x1="440" y1="556" x2="440" y2="640" />
+
+  <!-- footer note -->
+  <text class="note" x="16" y="708">Generated call-graph: main → simulator → task registration → gym.make → InstinctRlEnv → managers & motion ref → wrapper → runner.learn</text>
+</svg>
