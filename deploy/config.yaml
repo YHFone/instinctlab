@@ -1,0 +1,295 @@
+# Sim2Sim Deployment Configuration for G1 Parkour
+# This file contains all control parameters for the Parkour Sim2Sim deployment
+# Joint KP/KD are ordered according to MuJoCo joint order (excluding free joint)
+
+# =============================================================================
+# Paths Configuration
+# =============================================================================
+paths:
+  model_dir: ~/RL_robot/project-instinct/instinctlab/logs/instinct_rl/g1_parkour/20260224_102732/exported
+  xml_path: ~/RL_robot/project-instinct/instinctlab/source/instinctlab/instinctlab/assets/resources/unitree_g1/scene_29dof.xml
+
+# =============================================================================
+# Simulation Configuration
+# =============================================================================
+simulation:
+  sim_dt: 0.001          # Simulation timestep (1ms = 1000Hz)
+  decimation: 20          # Control decimation (control rate = sim_rate / decimation = 50Hz)
+
+# =============================================================================
+# Policy Configuration
+# =============================================================================
+policy:
+  action_scale: 0.5      # Action scaling factor (kept for backward compatibility, use joint_action_scales instead)
+  use_depth: true        # Enable depth camera
+
+# =============================================================================
+# Joint Action Scales (from training configuration)
+# These map policy output [-1, 1] to actual joint positions
+# Order: Isaac joint order (mapped to MuJoCo via isaac_to_mujoco)
+# =============================================================================
+# Isaac joint order:
+#   0:  left_shoulder_pitch_joint
+#   1:  right_shoulder_pitch_joint
+#   2:  waist_pitch_joint
+#   3:  left_shoulder_roll_joint
+#   4:  right_shoulder_roll_joint
+#   5:  waist_roll_joint
+#   6:  left_shoulder_yaw_joint
+#   7:  right_shoulder_yaw_joint
+#   8:  waist_yaw_joint
+#   9:  left_elbow_joint
+#   10: right_elbow_joint
+#   11: left_wrist_roll_joint
+#   12: right_wrist_roll_joint
+#   13: left_wrist_pitch_joint
+#   14: right_wrist_pitch_joint
+#   15: left_hip_pitch_joint
+#   16: right_hip_pitch_joint
+#   17: left_hip_roll_joint
+#   18: right_hip_roll_joint
+#   19: left_hip_yaw_joint
+#   20: right_hip_yaw_joint
+#   21: left_knee_joint
+#   22: right_knee_joint
+#   23: left_ankle_pitch_joint
+#   24: right_ankle_pitch_joint
+#   25: left_ankle_roll_joint
+#   26: right_ankle_roll_joint
+#   27: left_wrist_yaw_joint
+#   28: right_wrist_yaw_joint
+# =============================================================================
+joint_action_scales:
+  # Isaac order (matching training configuration)
+  - 0.43857731392336724   # left_shoulder_pitch_joint
+  - 0.43857731392336724   # right_shoulder_pitch_joint
+  - 0.43857731392336724   # waist_pitch_joint
+  - 0.43857731392336724   # left_shoulder_roll_joint
+  - 0.43857731392336724   # right_shoulder_roll_joint
+  - 0.43857731392336724   # waist_roll_joint
+  - 0.43857731392336724   # left_shoulder_yaw_joint
+  - 0.43857731392336724   # right_shoulder_yaw_joint
+  - 0.5475464652142303    # waist_yaw_joint
+  - 0.43857731392336724   # left_elbow_joint
+  - 0.43857731392336724   # right_elbow_joint
+  - 0.43857731392336724   # left_wrist_roll_joint
+  - 0.43857731392336724   # right_wrist_roll_joint
+  - 0.07450087032950714   # left_wrist_pitch_joint
+  - 0.07450087032950714   # right_wrist_pitch_joint
+  - 0.5475464652142303    # left_hip_pitch_joint
+  - 0.5475464652142303    # right_hip_pitch_joint
+  - 0.3506614663788243    # left_hip_roll_joint
+  - 0.3506614663788243    # right_hip_roll_joint
+  - 0.5475464652142303    # left_hip_yaw_joint
+  - 0.5475464652142303    # right_hip_yaw_joint
+  - 0.3506614663788243    # left_knee_joint
+  - 0.3506614663788243    # right_knee_joint
+  - 0.43857731392336724   # left_ankle_pitch_joint
+  - 0.43857731392336724   # right_ankle_pitch_joint
+  - 0.43857731392336724   # left_ankle_roll_joint
+  - 0.43857731392336724   # right_ankle_roll_joint
+  - 0.07450087032950714   # left_wrist_yaw_joint
+  - 0.07450087032950714   # right_wrist_yaw_joint
+
+# =============================================================================
+# Depth Camera Configuration
+# =============================================================================
+depth_camera:
+  width: 32              # After crop: 32 (from 64)
+  height: 18             # After crop: 18 (from 36)
+  history: 8             # Number of depth frames in history
+  history_skip_frames: 5 # Skip frames between depth history updates
+  original_width: 64     # Original before crop
+  original_height: 36    # Original before crop
+
+# =============================================================================
+# Observation Configuration (matching Isaac Lab)
+# =============================================================================
+observation:
+  base_ang_vel:
+    dim: 3
+    scale: 0.25
+    history: 8
+  projected_gravity:
+    dim: 3
+    history: 8
+  velocity_commands:
+    dim: 3
+    history: 8
+  joint_pos_rel:
+    dim: 29
+    history: 8
+  joint_vel_rel:
+    dim: 29
+    scale: 0.05
+    history: 8
+  actions:
+    dim: 29
+    history: 8
+
+# =============================================================================
+# Joint Index Mappings between Isaac and MuJoCo
+# =============================================================================
+# These mappings define how to convert joint arrays between Isaac joint order
+# (ISAAC_JOINT_NAMES in deploy/parkour_sim2sim_mujoco.py) and the MuJoCo joint
+# order listed below in the joints.kp/kd section.
+#
+# isaac_to_mujoco[i] = j  means: Isaac joint index i corresponds to MuJoCo index j.
+# mujoco_to_isaac[j] = i means: MuJoCo joint index j corresponds to Isaac index i.
+# =============================================================================
+mappings:
+  isaac_to_mujoco: [15, 22, 0, 16, 23, 1, 17, 24, 2, 18, 25, 3, 9, 19, 26, 4, 10, 20, 27, 5, 11, 21, 28, 6, 12, 7, 13, 8, 14]
+  mujoco_to_isaac: [2, 5, 8, 11, 15, 19, 23, 25, 27, 12, 16, 20, 24, 26, 28, 0, 3, 6, 9, 13, 17, 21, 1, 4, 7, 10, 14, 18, 22]
+
+# =============================================================================
+# Initial Joint Angles (for PD target in simulation)
+# Order: MuJoCo joint order (excluding floating_base_joint)
+# Source: G1_29DOF_TORSOBASE_POPSICLE_CFG init state
+# =============================================================================
+# Unconfigured joints default to 0.0
+# Values from unitree_g1.py G1_29DOF_TORSOBASE_POPSICLE_CFG
+# =============================================================================
+initial_joint_angles:
+  # Waist (all 0.0)
+  - 0.0       # waist_pitch_joint
+  - 0.0       # waist_roll_joint
+  - 0.0       # waist_yaw_joint
+  # Left Leg
+  - -0.312    # left_hip_pitch_joint
+  - 0.0       # left_hip_roll_joint
+  - 0.0       # left_hip_yaw_joint
+  - 0.669     # left_knee_joint
+  - -0.363    # left_ankle_pitch_joint
+  - 0.0       # left_ankle_roll_joint
+  # Right Leg
+  - -0.312    # right_hip_pitch_joint
+  - 0.0       # right_hip_roll_joint
+  - 0.0       # right_hip_yaw_joint
+  - 0.669     # right_knee_joint
+  - -0.363    # right_ankle_pitch_joint
+  - 0.0       # right_ankle_roll_joint
+  # Left Arm
+  - 0.2       # left_shoulder_pitch_joint
+  - 0.2       # left_shoulder_roll_joint
+  - 0.0       # left_shoulder_yaw_joint
+  - 0.6       # left_elbow_joint
+  - 0.0       # left_wrist_roll_joint
+  - 0.0       # left_wrist_pitch_joint
+  - 0.0       # left_wrist_yaw_joint
+  # Right Arm
+  - 0.2       # right_shoulder_pitch_joint
+  - -0.2      # right_shoulder_roll_joint
+  - 0.0       # right_shoulder_yaw_joint
+  - 0.6       # right_elbow_joint
+  - 0.0       # right_wrist_roll_joint
+  - 0.0       # right_wrist_pitch_joint
+  - 0.0       # right_wrist_yaw_joint
+
+# =============================================================================
+# Joint Control Parameters (KP, KD)
+# Order: MuJoCo joint order (excluding floating_base_joint)
+# Source: beyondmimic_g1_29dof_actuators configuration
+# =============================================================================
+# MuJoCo joint order:
+#   0:  waist_pitch_joint
+#   1:  waist_roll_joint
+#   2:  waist_yaw_joint
+#   3:  left_hip_pitch_joint
+#   4:  left_hip_roll_joint
+#   5:  left_hip_yaw_joint
+#   6:  left_knee_joint
+#   7:  left_ankle_pitch_joint
+#   8:  left_ankle_roll_joint
+#   9:  right_hip_pitch_joint
+#   10: right_hip_roll_joint
+#   11: right_hip_yaw_joint
+#   12: right_knee_joint
+#   13: right_ankle_pitch_joint
+#   14: right_ankle_roll_joint
+#   15: left_shoulder_pitch_joint
+#   16: left_shoulder_roll_joint
+#   17: left_shoulder_yaw_joint
+#   18: left_elbow_joint
+#   19: left_wrist_roll_joint
+#   20: left_wrist_pitch_joint
+#   21: left_wrist_yaw_joint
+#   22: right_shoulder_pitch_joint
+#   23: right_shoulder_roll_joint
+#   24: right_shoulder_yaw_joint
+#   25: right_elbow_joint
+#   26: right_wrist_roll_joint
+#   27: right_wrist_pitch_joint
+#   28: right_wrist_yaw_joint
+# =============================================================================
+joints:
+  kp:
+    # Waist
+    - 28.50   # waist_pitch_joint
+    - 28.50   # waist_roll_joint
+    - 40.18   # waist_yaw_joint (7520_14)
+    # Left Leg
+    - 40.18   # left_hip_pitch_joint (7520_14)
+    - 99.10   # left_hip_roll_joint (7520_22)
+    - 40.18   # left_hip_yaw_joint (7520_14)
+    - 99.10   # left_knee_joint (7520_22)
+    - 28.50   # left_ankle_pitch_joint (2x5020)
+    - 28.50   # left_ankle_roll_joint (2x5020)
+    # Right Leg
+    - 40.18   # right_hip_pitch_joint (7520_14)
+    - 99.10   # right_hip_roll_joint (7520_22)
+    - 40.18   # right_hip_yaw_joint (7520_14)
+    - 99.10   # right_knee_joint (7520_22)
+    - 28.50   # right_ankle_pitch_joint (2x5020)
+    - 28.50   # right_ankle_roll_joint (2x5020)
+    # Left Arm
+    - 14.25   # left_shoulder_pitch_joint (5020)
+    - 14.25   # left_shoulder_roll_joint (5020)
+    - 14.25   # left_shoulder_yaw_joint (5020)
+    - 14.25   # left_elbow_joint (5020)
+    - 14.25   # left_wrist_roll_joint (5020)
+    - 16.78   # left_wrist_pitch_joint (4010)
+    - 16.78   # left_wrist_yaw_joint (4010)
+    # Right Arm
+    - 14.25   # right_shoulder_pitch_joint (5020)
+    - 14.25   # right_shoulder_roll_joint (5020)
+    - 14.25   # right_shoulder_yaw_joint (5020)
+    - 14.25   # right_elbow_joint (5020)
+    - 14.25   # right_wrist_roll_joint (5020)
+    - 16.78   # right_wrist_pitch_joint (4010)
+    - 16.78   # right_wrist_yaw_joint (4010)
+
+  kd:
+    # Waist
+    - 1.8144  # waist_pitch_joint
+    - 1.8144  # waist_roll_joint
+    - 2.5579  # waist_yaw_joint (7520_14)
+    # Left Leg
+    - 2.5579  # left_hip_pitch_joint (7520_14)
+    - 6.3088  # left_hip_roll_joint (7520_22)
+    - 2.5579  # left_hip_yaw_joint (7520_14)
+    - 6.3088  # left_knee_joint (7520_22)
+    - 1.8144  # left_ankle_pitch_joint (2x5020)
+    - 1.8144  # left_ankle_roll_joint (2x5020)
+    # Right Leg
+    - 2.5579  # right_hip_pitch_joint (7520_14)
+    - 6.3088  # right_hip_roll_joint (7520_22)
+    - 2.5579  # right_hip_yaw_joint (7520_14)
+    - 6.3088  # right_knee_joint (7520_22)
+    - 1.8144  # right_ankle_pitch_joint (2x5020)
+    - 1.8144  # right_ankle_roll_joint (2x5020)
+    # Left Arm
+    - 0.9072  # left_shoulder_pitch_joint (5020)
+    - 0.9072  # left_shoulder_roll_joint (5020)
+    - 0.9072  # left_shoulder_yaw_joint (5020)
+    - 0.9072  # left_elbow_joint (5020)
+    - 0.9072  # left_wrist_roll_joint (5020)
+    - 1.0681  # left_wrist_pitch_joint (4010)
+    - 1.0681  # left_wrist_yaw_joint (4010)
+    # Right Arm
+    - 0.9072  # right_shoulder_pitch_joint (5020)
+    - 0.9072  # right_shoulder_roll_joint (5020)
+    - 0.9072  # right_shoulder_yaw_joint (5020)
+    - 0.9072  # right_elbow_joint (5020)
+    - 0.9072  # right_wrist_roll_joint (5020)
+    - 1.0681  # right_wrist_pitch_joint (4010)
+    - 1.0681  # right_wrist_yaw_joint (4010)

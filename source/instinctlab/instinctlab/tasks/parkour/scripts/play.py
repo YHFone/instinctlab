@@ -65,6 +65,7 @@ from isaaclab.envs import DirectMARLEnv, multi_agent_to_single_agent
 from isaaclab.utils.dict import print_dict
 from isaaclab.utils.io import load_pickle, load_yaml
 from isaaclab_tasks.utils import get_checkpoint_path, parse_env_cfg
+from isaaclab.assets import Articulation
 
 # Import extensions to set up environment tasks
 from instinctlab.utils.wrappers import InstinctRlVecEnvWrapper
@@ -127,6 +128,7 @@ def main():
 
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
+
     # wrap for video recording
     if args_cli.video:
         video_kwargs = {
@@ -146,6 +148,10 @@ def main():
 
     # wrap around environment for instinct-rl
     env = InstinctRlVecEnvWrapper(env)
+
+    # Print joint names for debugging
+    asset: Articulation = env.unwrapped.scene["robot"]
+    print("asset.data.joint_names:", asset.data.joint_names)
 
     # load previously trained model
     ppo_runner = OnPolicyRunner(env, agent_cfg_dict, log_dir=None, device=agent_cfg.device)

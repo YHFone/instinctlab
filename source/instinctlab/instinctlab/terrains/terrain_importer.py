@@ -59,7 +59,26 @@ class TerrainImporter(TerrainImporterBase):
             mesh: The trimesh object to import.
         """
         mesh.merge_vertices()
-        mesh.remove_duplicate_faces()
+        # trimesh API changed across versions: some versions don't have
+        # `remove_duplicate_faces`. Use it if present, otherwise fallback
+        # to a robust duplicate-face removal that ignores face orientation.
+        if hasattr(mesh, "remove_duplicate_faces"):
+            mesh.remove_duplicate_faces()
+        else:
+            # Remove duplicate faces by sorting vertex indices per face
+            # and keeping the first occurrence of each unique face.
+            try:
+                faces = mesh.faces
+                # sort vertex indices within each face so orientation doesn't matter
+                sorted_faces = np.sort(faces, axis=1)
+                _, unique_idx = np.unique(sorted_faces, axis=0, return_index=True)
+                # preserve original ordering of kept faces
+                unique_idx = np.sort(unique_idx)
+                mesh.faces = mesh.faces[unique_idx]
+            except Exception:
+                # If any unexpected issue occurs, fall back to no-op to avoid crash here;
+                # the subsequent mesh processing may still fail, but we avoid AttributeError.
+                pass
         mesh.remove_unreferenced_vertices()
         # Generate virtual obstacles based on the imported mesh.
         # NOTE: generate virtual obstacle first because it might modify the mesh.

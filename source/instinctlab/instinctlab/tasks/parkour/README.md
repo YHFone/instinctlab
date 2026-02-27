@@ -33,3 +33,16 @@ python source/instinctlab/instinctlab/tasks/parkour/scripts/play.py --task=Insti
 - `--video`: Record training/playback videos
 - `--exportonnx`: Export the trained model to ONNX format for onboard deployment during playing
 - `--useonnx`: Use the ONNX model for inference during playing (requires `--exportonnx`)
+
+
+python source/instinctlab/instinctlab/tasks/parkour/scripts/play.py --task Instinct-Parkour-Target-Amp-G1-v0 --load_run /home/zy0028/RL_robot/project-instinct/instinctlab/logs/instinct_rl/g1_parkour/20260203_091446 --checkpoint model_6000.pt --num_envs 1 
+
+
+基于checkpoint 继续训练 ：
+python scripts/instinct_rl/train.py --headless \
+  --task=Instinct-Parkour-Target-Amp-G1-v0 \
+  --resume \
+  --load_run=/home/zy0028/RL_robot/project-instinct/instinctlab/logs/instinct_rl/g1_parkour/20260203_091446 \
+  --checkpoint=model_6000.pt \
+  --max_iterations=24000
+

@@ -437,7 +437,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="AMASS filtering script")
     parser.add_argument("--datadir", help="path to the directory containing the AMASS dataset", required=True)
-    parser.add_argument("--urdf_path", help="path to the URDF file", default=G1_29DOF_CFG.spawn.asset_path)
+    parser.add_argument("--urdf_path", help="path to the URDF file", default=G1_29DOF_TORSOBASE_CFG.spawn.asset_path)
     parser.add_argument("--startfromfiles", help="the subset list to filter from", type=str, default=None)
     parser.add_argument("--output", help="output file", default="output.yaml")
     parser.add_argument("--mp", action="store_true", help="use multiprocessing")
